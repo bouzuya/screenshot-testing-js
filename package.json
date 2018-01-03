@@ -10,6 +10,11 @@
   "bugs": {
     "url": "https://github.com/bouzuya/screenshot-testing-js/issues"
   },
+  "dependencies": {
+    "@bouzuya/compare-images": "^0.1.0",
+    "pngjs": "^3.3.1",
+    "puppeteer": "^0.13.0"
+  },
   "devDependencies": {
     "@types/node": "^8.5.5",
     "@types/power-assert": "^1.4.29",
