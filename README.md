@@ -1,5 +1,7 @@
 # screenshot-testing-js
 
+A screenshot testing tool for JavaScript (Node.js).
+
 ## License
 
 [MIT](LICENSE)

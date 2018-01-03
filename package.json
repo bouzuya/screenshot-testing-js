@@ -1,0 +1,24 @@
+{
+  "name": "@bouzuya/screenshot-testing",
+  "description": "A screenshot testing tool for JavaScript (Node.js)",
+  "version": "1.0.0",
+  "author": {
+    "email": "m@bouzuya.net",
+    "name": "bouzuya",
+    "url": "http://bouzuya.net"
+  },
+  "bugs": {
+    "url": "https://github.com/bouzuya/screenshot-testing-js/issues"
+  },
+  "homepage": "https://github.com/bouzuya/screenshot-testing-js#readme",
+  "keywords": [],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bouzuya/screenshot-testing-js.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
