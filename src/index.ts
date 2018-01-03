@@ -1,3 +1,25 @@
-const add = (x: number, y: number): number => x + y;
+import { approve } from './approve';
+import { capture } from './capture';
+import { compare } from './compare';
 
-export { add };
+const execute = async (command: 'approve' | 'capture' | 'compare' | 'test') => {
+  if (command === 'approve') {
+    await approve();
+  } else if (command === 'capture') {
+    await capture();
+  } else if (command === 'compare') {
+    await compare();
+  } else if (command === 'test') {
+    await capture();
+    await compare();
+  } else {
+    throw new Error('unknown command');
+  }
+};
+
+export {
+  approve,
+  capture,
+  compare,
+  execute
+};
