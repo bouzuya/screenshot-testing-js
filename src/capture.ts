@@ -58,9 +58,10 @@ const viewportHelper = (viewport: string): {
   };
 };
 
-const scenario1 = async (
-  page: puppeteer.Page
-): Promise<{ name: string; clip?: puppeteer.BoundingBox; }> => {
+const scenario1 = (): {
+  action: (page: puppeteer.Page) => Promise<{ clip?: puppeteer.BoundingBox; }>;
+  name: string;
+} => {
   const baseName = 'scenario1';
   const language = 'ja';
   const url = 'https://blog.bouzuya.net/2017/01/01/';
@@ -74,15 +75,21 @@ const scenario1 = async (
     page: viewportPageHelper
   } = viewportHelper(viewport);
   const name = viewportNameHelper(languageNameHelper(baseName));
-  await languagePageHelper(page);
-  await viewportPageHelper(page);
-  await page.goto(url);
-  return { name };
+  return {
+    action: async (page) => {
+      await languagePageHelper(page);
+      await viewportPageHelper(page);
+      await page.goto(url);
+      return {};
+    },
+    name
+  };
 };
 
-const scenario2 = async (
-  page: puppeteer.Page
-): Promise<{ name: string; clip?: puppeteer.BoundingBox; }> => {
+const scenario2 = (): {
+  action: (page: puppeteer.Page) => Promise<{ clip?: puppeteer.BoundingBox; }>;
+  name: string;
+} => {
   const baseName = 'scenario2';
   const language = 'ja';
   const url = 'https://blog.bouzuya.net/2017/01/02/';
@@ -96,23 +103,28 @@ const scenario2 = async (
     page: viewportPageHelper
   } = viewportHelper(viewport);
   const name = languageNameHelper(viewportNameHelper(baseName));
-  await languagePageHelper(page);
-  await viewportPageHelper(page);
-  await page.goto(url);
-  return { name };
+  return {
+    action: async (page) => {
+      await languagePageHelper(page);
+      await viewportPageHelper(page);
+      await page.goto(url);
+      return {};
+    },
+    name
+  };
 };
 
 const capture = async () => {
   const browser = await puppeteer.launch();
   const scenarios = [
-    scenario1,
-    scenario2
+    scenario1(),
+    scenario2()
   ];
-  await scenarios.reduce((promise, scenario) => {
+  await scenarios.reduce((promise, { action, name }) => {
     return promise
       .then(() => browser.newPage())
-      .then((page) => scenario(page).then((o) => Object.assign({ page }, o)))
-      .then(({ page, name, clip }) => {
+      .then((page) => action(page).then((o) => Object.assign({ page }, o)))
+      .then(({ page, clip }) => {
         const capturedDirectory = '.tmp/captured/';
         return screenshotHelper(page, name, capturedDirectory, clip);
       });
