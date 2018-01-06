@@ -9,17 +9,22 @@ const ensureKey = (tmpl: string, key: string): string => {
     : tmpl + '/{' + key + '}';
 };
 
-const languageHelper = async (
-  page: puppeteer.Page,
-  name: string,
-  language: string
-): Promise<string> => {
-  await page.evaluateOnNewDocument([
-    'Object.defineProperty(navigator, "language", {',
-    '  get() { return "' + language + '"; }',
-    '})'
-  ].join(''));
-  return format(ensureKey(name, 'language'), 'language', language);
+const languageHelper = (language: string): {
+  name: (name: string) => string;
+  page: (page: puppeteer.Page) => Promise<void>;
+} => {
+  return {
+    name: (name) => {
+      return format(ensureKey(name, 'language'), 'language', language);
+    },
+    page: (page) => {
+      return page.evaluateOnNewDocument([
+        'Object.defineProperty(navigator, "language", {',
+        '  get() { return "' + language + '"; }',
+        '})'
+      ].join(''));
+    }
+  };
 };
 
 const screenshotHelper = async (
@@ -35,50 +40,66 @@ const screenshotHelper = async (
   await page.screenshot({ clip, path, type });
 };
 
-const viewportHelper = async (
-  page: puppeteer.Page,
-  name: string,
-  viewport: string
-): Promise<string> => {
-  // viewport
-  const [width, height] = viewport
-    .split('x')
-    .map((s) => parseInt(s, 10));
-  const viewportObject = { height, width };
-  page.setViewport(viewportObject);
-  return format(ensureKey(name, 'viewport'), 'viewport', viewport);
+const viewportHelper = (viewport: string): {
+  name: (name: string) => string;
+  page: (page: puppeteer.Page) => Promise<void>;
+} => {
+  return {
+    name: (name) => {
+      return format(ensureKey(name, 'viewport'), 'viewport', viewport);
+    },
+    page: (page) => {
+      const [width, height] = viewport
+        .split('x')
+        .map((s) => parseInt(s, 10));
+      const viewportObject = { height, width };
+      return page.setViewport(viewportObject);
+    }
+  };
 };
 
 const scenario1 = async (
   page: puppeteer.Page
 ): Promise<{ name: string; clip?: puppeteer.BoundingBox; }> => {
-  const name = 'scenario1';
+  const baseName = 'scenario1';
   const language = 'ja';
   const url = 'https://blog.bouzuya.net/2017/01/01/';
   const viewport = '320x480';
-
-  const name1 = await languageHelper(page, name, language);
-  const name2 = await viewportHelper(page, name1, viewport);
-
+  const {
+    name: languageNameHelper,
+    page: languagePageHelper
+  } = languageHelper(language);
+  const {
+    name: viewportNameHelper,
+    page: viewportPageHelper
+  } = viewportHelper(viewport);
+  const name = viewportNameHelper(languageNameHelper(baseName));
+  await languagePageHelper(page);
+  await viewportPageHelper(page);
   await page.goto(url);
-
-  return { name: name2 };
+  return { name };
 };
 
 const scenario2 = async (
   page: puppeteer.Page
 ): Promise<{ name: string; clip?: puppeteer.BoundingBox; }> => {
-  const name = 'scenario2';
+  const baseName = 'scenario2';
   const language = 'ja';
   const url = 'https://blog.bouzuya.net/2017/01/02/';
   const viewport = '320x480';
-
-  const name1 = await languageHelper(page, name, language);
-  const name2 = await viewportHelper(page, name1, viewport);
-
+  const {
+    name: languageNameHelper,
+    page: languagePageHelper
+  } = languageHelper(language);
+  const {
+    name: viewportNameHelper,
+    page: viewportPageHelper
+  } = viewportHelper(viewport);
+  const name = languageNameHelper(viewportNameHelper(baseName));
+  await languagePageHelper(page);
+  await viewportPageHelper(page);
   await page.goto(url);
-
-  return { name: name2 };
+  return { name };
 };
 
 const capture = async () => {
