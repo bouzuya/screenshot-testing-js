@@ -16,15 +16,14 @@ const screenshotHelper = async (
   await page.screenshot({ clip, path, type });
 };
 
-const capture = async ({ scenarios }: Options) => {
+const capture = async ({ path: { captured }, scenarios }: Options) => {
   const browser = await puppeteer.launch();
   await scenarios.reduce((promise, { action, name }) => {
     return promise
       .then(() => browser.newPage())
       .then((page) => action(page).then((o) => Object.assign({ page }, o)))
       .then(({ page, clip }) => {
-        const capturedDirectory = '.tmp/captured/';
-        return screenshotHelper(page, name, capturedDirectory, clip);
+        return screenshotHelper(page, name, captured, clip);
       });
   }, Promise.resolve());
   await browser.close();

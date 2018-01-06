@@ -96,11 +96,15 @@ const scenario2 = (): Scenario => {
 };
 
 const newExampleOptions = (): Options => {
-  const scenarios = [
-    scenario1(),
-    scenario2()
-  ];
-  return { scenarios };
+  return {
+    path: {
+      captured: '.tmp/captured/'
+    },
+    scenarios: [
+      scenario1(),
+      scenario2()
+    ]
+  };
 };
 
 export { newExampleOptions };
