@@ -49,8 +49,9 @@ const viewportHelper = async (
   return format(ensureKey(name, 'viewport'), 'viewport', viewport);
 };
 
-const scenario1 = async (page: puppeteer.Page): Promise<void> => {
-  const capturedDirectory = '.tmp/captured/';
+const scenario1 = async (
+  page: puppeteer.Page
+): Promise<{ name: string; clip?: puppeteer.BoundingBox; }> => {
   const name = 'scenario1';
   const language = 'ja';
   const url = 'https://blog.bouzuya.net/2017/01/01/';
@@ -61,11 +62,12 @@ const scenario1 = async (page: puppeteer.Page): Promise<void> => {
 
   await page.goto(url);
 
-  await screenshotHelper(page, name2, capturedDirectory);
+  return { name: name2 };
 };
 
-const scenario2 = async (page: puppeteer.Page) => {
-  const capturedDirectory = '.tmp/captured/';
+const scenario2 = async (
+  page: puppeteer.Page
+): Promise<{ name: string; clip?: puppeteer.BoundingBox; }> => {
   const name = 'scenario2';
   const language = 'ja';
   const url = 'https://blog.bouzuya.net/2017/01/02/';
@@ -76,7 +78,7 @@ const scenario2 = async (page: puppeteer.Page) => {
 
   await page.goto(url);
 
-  await screenshotHelper(page, name2, capturedDirectory);
+  return { name: name2 };
 };
 
 const capture = async () => {
@@ -88,7 +90,11 @@ const capture = async () => {
   await scenarios.reduce((promise, scenario) => {
     return promise
       .then(() => browser.newPage())
-      .then((page) => scenario(page));
+      .then((page) => scenario(page).then((o) => Object.assign({ page }, o)))
+      .then(({ page, name, clip }) => {
+        const capturedDirectory = '.tmp/captured/';
+        return screenshotHelper(page, name, capturedDirectory, clip);
+      });
   }, Promise.resolve());
   await browser.close();
 };
