@@ -1,5 +1,4 @@
 const format = (tmpl: string, key: string, value: string): string => {
-  if (tmpl.length === 0) throw new Error('invalid name');
   if (key.indexOf('{') >= 0 || key.indexOf('}') >= 0) {
     throw new Error('invalid key');
   }
