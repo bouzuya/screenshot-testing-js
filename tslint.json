@@ -31,6 +31,12 @@
         "multiline": "never",
         "singleline": "never"
       }
+    ],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
     ]
   },
   "rulesDirectory": []
