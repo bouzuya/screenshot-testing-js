@@ -6,15 +6,14 @@ import {
   getDiffDimension,
   getDiffImage,
   isSame,
-  isSameDimension,
-  newImage
+  isSameDimension
 } from '@bouzuya/compare-images';
 import * as fs from 'fs-extra';
 import { join as pathJoin } from 'path';
-import { PNG } from 'pngjs';
 import { Options } from '../data/options';
 import { Scenario } from '../data/scenario';
-import { ensureError, isNoImageError, newNoImageError } from './error';
+import { ensureError, isNoImageError } from './error';
+import { loadImage, saveImage } from './image-io';
 
 export type CompareScenarioResult =
   CompareScenarioResultNoApproved |
@@ -59,36 +58,6 @@ const compareImages = (
   } catch (error) {
     return Promise.reject(ensureError(error));
   }
-};
-
-const loadImage = (filePath: string): Promise<Image> => {
-  return fs.pathExists(filePath)
-    .then((exists) => {
-      if (!exists) throw newNoImageError(filePath);
-      return fs.readFile(filePath);
-    })
-    .then((pngData) => parsePNG(pngData))
-    .then((png) => newImage(png.data, png.height, png.width))
-    .catch((error) => Promise.reject(ensureError(error)));
-};
-
-const saveImage = (filePath: string, image: Image): Promise<void> => {
-  const png = new PNG({ height: image.height, width: image.width });
-  png.data = image.data;
-  // workaround @types/pngjs bug
-  return fs.outputFile(filePath, PNG.sync.write(png as any));
-};
-
-const parsePNG = (pngData: Buffer): Promise<PNG> => {
-  return new Promise<PNG>((resolve, reject) => {
-    new PNG().parse(pngData, (error, png) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(png);
-      }
-    });
-  });
 };
 
 const compareScenario = async (
@@ -145,36 +114,24 @@ const saveResult = (
   { name: screenshotName }: Scenario,
   result: CompareScenarioResult
 ): Promise<void> => {
+  const resultJSON = pathJoin(compared, screenshotName + '.json');
   if (result.type === 'no_approved') {
-    return fs.outputJSON(
-      pathJoin(compared, screenshotName + '.json'),
-      { result: result.type }
-    );
+    return fs.outputJSON(resultJSON, { result: result.type });
   } else if (result.type === 'no_captured') {
-    return fs.outputJSON(
-      pathJoin(compared, screenshotName + '.json'),
-      { result: result.type }
-    );
+    return fs.outputJSON(resultJSON, { result: result.type });
   } else if (result.type === 'not_same_dimension') {
-    return fs.outputJSON(
-      pathJoin(compared, screenshotName + '.json'),
-      { result: result.type, diffDimension: result.diffDimension }
-    );
-  } else if (result.type === 'not_same') {
-    return fs.outputJSON(
-      pathJoin(compared, screenshotName + '.json'),
-      { result: result.type }
-    ).then(() => {
-      saveImage(
-        pathJoin(compared, screenshotName + '.png'),
-        result.diffImage
-      );
+    return fs.outputJSON(resultJSON, {
+      diffDimension: result.diffDimension,
+      result: result.type
     });
+  } else if (result.type === 'not_same') {
+    return fs.outputJSON(resultJSON, { result: result.type })
+      .then(() => {
+        const resultPNG = pathJoin(compared, screenshotName + '.png');
+        return saveImage(resultPNG, result.diffImage);
+      });
   } else if (result.type === 'same') {
-    return fs.outputJSON(
-      pathJoin(compared, screenshotName + '.json'),
-      { result: result.type }
-    );
+    return fs.outputJSON(resultJSON, { result: result.type });
   } else if (result.type === 'unknown') {
     return Promise.reject(result);
   } else {
