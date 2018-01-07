@@ -7,8 +7,8 @@ import {
 import * as fs from 'fs-extra';
 import { join as pathJoin } from 'path';
 import { PNG } from 'pngjs';
-import { Options } from './data/options';
-import { Scenario } from './data/scenario';
+import { Options } from '../data/options';
+import { Scenario } from '../data/scenario';
 
 const parsePNG = (pngData: Buffer): Promise<PNG> => {
   return new Promise<PNG>((resolve, reject) => {
