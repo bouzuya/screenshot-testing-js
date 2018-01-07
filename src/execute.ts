@@ -6,7 +6,7 @@ import { compare } from './compare';
 const execute = async (command: 'approve' | 'capture' | 'compare' | 'test') => {
   const options = newExampleOptions(); // FIXME
   if (command === 'approve') {
-    await approve();
+    await approve(options);
   } else if (command === 'capture') {
     await capture(options);
   } else if (command === 'compare') {
