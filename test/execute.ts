@@ -16,11 +16,13 @@ const setUp = () => {
       './compare': { compare }
     }
   ).execute;
+  const options = {} as any; // TODO
   return {
     approve,
     capture,
     compare,
-    execute
+    execute,
+    options
   };
 };
 
@@ -31,9 +33,10 @@ const tests: Test[] = [
       approve,
       capture,
       compare,
-      execute
+      execute,
+      options
     } = setUp();
-    return execute('approve').then(() => {
+    return execute('approve', options).then(() => {
       assert(approve.callCount === 1);
       assert(capture.callCount === 0);
       assert(compare.callCount === 0);
@@ -44,9 +47,10 @@ const tests: Test[] = [
       approve,
       capture,
       compare,
-      execute
+      execute,
+      options
     } = setUp();
-    return execute('capture').then(() => {
+    return execute('capture', options).then(() => {
       assert(approve.callCount === 0);
       assert(capture.callCount === 1);
       assert(compare.callCount === 0);
@@ -57,9 +61,10 @@ const tests: Test[] = [
       approve,
       capture,
       compare,
-      execute
+      execute,
+      options
     } = setUp();
-    return execute('compare').then(() => {
+    return execute('compare', options).then(() => {
       assert(approve.callCount === 0);
       assert(capture.callCount === 0);
       assert(compare.callCount === 1);
@@ -70,9 +75,10 @@ const tests: Test[] = [
       approve,
       capture,
       compare,
-      execute
+      execute,
+      options
     } = setUp();
-    return execute('test').then(() => {
+    return execute('test', options).then(() => {
       assert(approve.callCount === 0);
       assert(capture.callCount === 1);
       assert(compare.callCount === 1);

@@ -1,10 +1,8 @@
 import { Test, test } from 'beater';
 import * as assert from 'power-assert';
-import * as proxyquire from 'proxyquire';
-import * as sinon from 'sinon';
-import { format } from '../../src/_/format';
+import { format } from '../../example/format';
 
-const category = '/_/format ';
+const category = '/example/format ';
 const tests: Test[] = [
   test(category + 'name', () => {
     assert(format('', 'foo', 'value') === '');

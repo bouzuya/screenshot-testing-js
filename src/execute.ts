@@ -1,10 +1,12 @@
-import { newExampleOptions } from './_/example-options';
 import { approve } from './approve';
 import { capture } from './capture';
 import { compare } from './compare';
+import { Options } from './data/options';
 
-const execute = async (command: 'approve' | 'capture' | 'compare' | 'test') => {
-  const options = newExampleOptions(); // FIXME
+const execute = async (
+  command: 'approve' | 'capture' | 'compare' | 'test',
+  options: Options
+) => {
   if (command === 'approve') {
     await approve(options);
   } else if (command === 'capture') {

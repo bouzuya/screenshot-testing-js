@@ -1,6 +1,6 @@
 import * as puppeteer from 'puppeteer';
-import { Options } from '../data/options';
-import { Scenario } from '../data/scenario';
+import { Options } from '../src/data/options'; // FIXME
+import { Scenario } from '../src/data/scenario'; // FIXME
 import { format } from './format';
 
 const ensureKey = (tmpl: string, key: string): string => {
@@ -98,9 +98,9 @@ const scenario2 = (): Scenario => {
 const newExampleOptions = (): Options => {
   return {
     path: {
-      approved: 'approved/',
-      captured: '.tmp/captured/',
-      compared: '.tmp/compared/'
+      approved: '.tmp/example/approved/',
+      captured: '.tmp/example/captured/',
+      compared: '.tmp/example/compared/'
     },
     scenarios: [
       scenario1(),
