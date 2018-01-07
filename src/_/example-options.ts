@@ -99,7 +99,8 @@ const newExampleOptions = (): Options => {
   return {
     path: {
       approved: 'approved/',
-      captured: '.tmp/captured/'
+      captured: '.tmp/captured/',
+      compared: '.tmp/compared/'
     },
     scenarios: [
       scenario1(),

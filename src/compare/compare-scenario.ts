@@ -72,6 +72,13 @@ const loadImage = (filePath: string): Promise<Image> => {
     .catch((error) => Promise.reject(ensureError(error)));
 };
 
+const saveImage = (filePath: string, image: Image): Promise<void> => {
+  const png = new PNG({ height: image.height, width: image.width });
+  png.data = image.data;
+  // workaround @types/pngjs bug
+  return fs.outputFile(filePath, PNG.sync.write(png as any));
+};
+
 const parsePNG = (pngData: Buffer): Promise<PNG> => {
   return new Promise<PNG>((resolve, reject) => {
     new PNG().parse(pngData, (error, png) => {
@@ -125,4 +132,54 @@ const compareScenario = async (
   }
 };
 
-export { compareScenario };
+const compareScenarioAndSaveResult = (
+  options: Options,
+  scenario: Scenario
+): Promise<void> => {
+  return compareScenario(options, scenario)
+    .then((result) => saveResult(options, scenario, result));
+};
+
+const saveResult = (
+  { path: { compared } }: Options,
+  { name: screenshotName }: Scenario,
+  result: CompareScenarioResult
+): Promise<void> => {
+  if (result.type === 'no_approved') {
+    return fs.outputJSON(
+      pathJoin(compared, screenshotName + '.json'),
+      { result: result.type }
+    );
+  } else if (result.type === 'no_captured') {
+    return fs.outputJSON(
+      pathJoin(compared, screenshotName + '.json'),
+      { result: result.type }
+    );
+  } else if (result.type === 'not_same_dimension') {
+    return fs.outputJSON(
+      pathJoin(compared, screenshotName + '.json'),
+      { result: result.type, diffDimension: result.diffDimension }
+    );
+  } else if (result.type === 'not_same') {
+    return fs.outputJSON(
+      pathJoin(compared, screenshotName + '.json'),
+      { result: result.type }
+    ).then(() => {
+      saveImage(
+        pathJoin(compared, screenshotName + '.png'),
+        result.diffImage
+      );
+    });
+  } else if (result.type === 'same') {
+    return fs.outputJSON(
+      pathJoin(compared, screenshotName + '.json'),
+      { result: result.type }
+    );
+  } else if (result.type === 'unknown') {
+    return Promise.reject(result);
+  } else {
+    throw new Error(`assert unknown compare scenario result: ${result}`);
+  }
+};
+
+export { compareScenarioAndSaveResult as compareScenario };
