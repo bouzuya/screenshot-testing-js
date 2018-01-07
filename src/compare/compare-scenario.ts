@@ -104,9 +104,12 @@ const compareScenario = async (
 const compareScenarioAndSaveResult = (
   options: Options,
   scenario: Scenario
-): Promise<void> => {
+): Promise<CompareScenarioResult> => {
   return compareScenario(options, scenario)
-    .then((result) => saveResult(options, scenario, result));
+    .then((result) => {
+      return saveResult(options, scenario, result)
+        .then(() => result);
+    });
 };
 
 const saveResult = (
