@@ -98,6 +98,7 @@ const scenario2 = (): Scenario => {
 const newExampleOptions = (): Options => {
   return {
     path: {
+      approved: 'approved/',
       captured: '.tmp/captured/'
     },
     scenarios: [

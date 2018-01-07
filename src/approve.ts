@@ -1,8 +1,7 @@
 import * as fs from 'fs-extra';
 import { Options } from './data/options';
 
-const approve = async ({ path: { captured } }: Options) => {
-  const approved = 'approved';
+const approve = async ({ path: { approved, captured } }: Options) => {
   await fs.copy(captured, approved, {
     overwrite: true,
     recursive: true
