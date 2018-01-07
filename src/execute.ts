@@ -10,10 +10,10 @@ const execute = async (command: 'approve' | 'capture' | 'compare' | 'test') => {
   } else if (command === 'capture') {
     await capture(options);
   } else if (command === 'compare') {
-    await compare();
+    await compare(options);
   } else if (command === 'test') {
     await capture(options);
-    await compare();
+    await compare(options);
   } else {
     throw new Error('unknown command');
   }

@@ -16,7 +16,7 @@
     "url": "https://github.com/bouzuya/screenshot-testing-js/issues"
   },
   "dependencies": {
-    "@bouzuya/compare-images": "^0.1.0",
+    "@bouzuya/compare-images": "^0.1.1",
     "fs-extra": "^5.0.0",
     "pngjs": "^3.3.1",
     "puppeteer": "^0.13.0"
@@ -24,6 +24,7 @@
   "devDependencies": {
     "@types/fs-extra": "^5.0.0",
     "@types/node": "^8.5.5",
+    "@types/pngjs": "^3.3.0",
     "@types/power-assert": "^1.4.29",
     "@types/proxyquire": "^1.3.28",
     "@types/puppeteer": "^0.13.9",
