@@ -256,10 +256,14 @@ const html = (scriptPath: string): string => {
       width: 100%;
     }
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left {
+      background-color: #fcc;
       border-right: 2px solid #000;
       width: 50%;
       z-index: 10;
       resize: horizontal;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right {
+      background-color: #ccf;
     }
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .image,
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .image {
