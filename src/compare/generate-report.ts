@@ -95,6 +95,19 @@ const html = (scriptPath: string): string => {
         ]);
       };
 
+      const slideMin = () => {
+        document.querySelector('input[type=range]').value = 0;
+        document.querySelector('.left').style.width = '0%';
+      };
+      const slide = (e) => {
+        const value = e.target.value;
+        document.querySelector('.left').style.width = value + '%';
+      };
+      const slideMax = () => {
+        document.querySelector('input[type=range]').value = 100;
+        document.querySelector('.left').style.width = '100%';
+      };
+
       const click = (detail) => {
         return (event) => {
           const { approvedUrl, capturedUrl, name, type } = detail;
@@ -104,6 +117,15 @@ const html = (scriptPath: string): string => {
                 h('header', {}, [
                   h('div', { class: 'name' }, [name]),
                   h('div', { class: 'type' }, [type]),
+                  h('div', { class: 'control' }, [
+                    h('button', {
+                      on: { click: () => slideMin() }
+                    }, ['|<']),
+                    h('input', { type: 'range', min: 0, max: 100, value: 50, on: { input: slide } }, []),
+                    h('button', {
+                      on: { click: () => slideMax() }
+                    }, ['>|']),
+                  ])
                 ]),
                 h('div', { class: 'body' }, [
                   h('div', { class: 'left' }, [
@@ -231,7 +253,26 @@ const html = (scriptPath: string): string => {
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header {
       box-sizing: border-box;
       height: 64px;
-      padding: 8px;
+      padding: 8px 0 0 0;
+      text-align: center;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header > .name,
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header > .type {
+      padding: 0 8px;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header > .control {
+      text-align: center;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header > .control > input {
+      margin: 0;
+      padding: 0;
+      vertical-align: top;
+      width: 50%;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header > .control > button {
+      margin: 0;
+      padding: 0;
+      vertical-align: top;
     }
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body {
       bottom: 0;
@@ -242,6 +283,7 @@ const html = (scriptPath: string): string => {
     }
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left,
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right {
+      background-color: #fff;
       height: 100%;
       overflow: hidden;
       position: absolute;
@@ -250,7 +292,7 @@ const html = (scriptPath: string): string => {
       width: 100%;
     }
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left {
-      border-right: 1px solid #000;
+      border-right: 3px solid #000;
       width: 50%;
       z-index: 10;
     }
