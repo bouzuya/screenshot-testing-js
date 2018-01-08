@@ -1,5 +1,5 @@
 import * as fs from 'fs-extra';
-import * as open from 'open';
+import open = require('open');
 import { join as pathJoin, relative as pathRelative } from 'path';
 import { Options } from '../data/options';
 import { Scenario } from '../data/scenario';
@@ -60,27 +60,37 @@ const html = (scriptPath: string): string => {
         });
         return e;
       };
+      // create view
       const view = (
-        { allCount, details, failedCount, passedCount },
-        { closeDialog, openDialog }
+        { allCount, details, failedCount, filter, passedCount },
+        { closeDialog, filterAll, filterFailed, filterPassed, openDialog }
       ) => {
         return h('div', { class: 'root' }, [
           h('div', { class: 'summary' }, [
             h('div', { class: 'tests' }, [
-              h('span', { class: 'value' }, [allCount]),
+              h('span', {
+                class: 'value',
+                on: { click: filterAll() }
+              }, [allCount]),
               h('span', { class: 'unit' }, ['tests'])
             ]),
             h('div', { class: 'passed' }, [
-              h('span', { class: 'value' }, [passedCount]),
+              h('span', {
+                class: 'value',
+                on: { click: filterPassed() }
+              }, [passedCount]),
               h('span', { class: 'unit' }, ['passed'])
             ]),
             h('div', { class: 'failed' }, [
-              h('span', { class: 'value' }, [failedCount]),
+              h('span', {
+                class: 'value',
+                on: { click: filterFailed() }
+              }, [failedCount]),
               h('span', { class: 'unit' }, ['failed'])
             ])
           ]),
           h('div', { class: 'details' }, [
-            h('ul', {}, details.map((detail) => {
+            h('ul', {}, details.filter((i) => filter(i)).map((detail) => {
               const { comparedUrl, name, type } = detail;
               return h('li', {}, [
                 h('div', {
@@ -101,7 +111,49 @@ const html = (scriptPath: string): string => {
           h('div', { class: 'dialog-container' }, [])
         ]);
       };
+      // render / re-render
+      const render = (state) => {
+        const root = view(
+          Object.assign({}, state.results, {
+            filter: state.filter === 'all'
+              ? (_) => true
+              : state.filter === 'failed'
+                ? (i) => i.type !== 'same'
+                : state.filter === 'passed'
+                  ? (i) => i.type === 'same'
+                  : (_) => false // unknown filter
+          }),
+          { closeDialog, filterAll, filterFailed, filterPassed, openDialog }
+        );
+        const body = document.querySelector('.body');
+        while (body.hasChildNodes()) {
+          body.removeChild(body.firstChild);
+        }
+        body.appendChild(root);
+      };
 
+      // state
+      const state = {
+        filter: 'failed',
+        results: ScreenshotTesting
+      };
+
+      // event handler
+      const filterAll = () => {
+        return (_) => {
+          render(Object.assign({}, state, { filter: 'all' }));
+        };
+      };
+      const filterFailed = () => {
+        return (_) => {
+          render(Object.assign({}, state, { filter: 'failed' }));
+        };
+      };
+      const filterPassed = () => {
+        return (_) => {
+          render(Object.assign({}, state, { filter: 'passed' }));
+        };
+      };
       const closeDialog = () => {
         return (_) => {
           const dialog = document.querySelector('.dialog');
@@ -150,9 +202,9 @@ const html = (scriptPath: string): string => {
           setTimeout(() => dialog.classList.add('is-visible'), 100);
         };
       };
-      const root = view(ScreenshotTesting, { closeDialog, openDialog });
-      const body = document.querySelector('.body');
-      body.appendChild(root);
+
+      // start
+      render(state);
     });
   </script>
   <style>
@@ -174,8 +226,29 @@ const html = (scriptPath: string): string => {
     .root > .summary > .tests,
     .root > .summary > .passed,
     .root > .summary > .failed {
-      display: inline;
+      display: inline-block;
       padding: 8px;
+    }
+    .root > .summary > .tests > .value,
+    .root > .summary > .passed > .value,
+    .root > .summary > .failed > .value {
+      border: 2px solid #000;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      padding: 8px;
+    }
+    .root > .summary > .tests > .value:focus,
+    .root > .summary > .tests > .value:hover,
+    .root > .summary > .passed > .value:focus,
+    .root > .summary > .passed > .value:hover,
+    .root > .summary > .failed > .value:focus,
+    .root > .summary > .failed > .value:hover {
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    }
+    .root > .summary > .tests > .value:active,
+    .root > .summary > .passed > .value:active,
+    .root > .summary > .failed > .value:active {
+      box-shadow: unset;
     }
     .root > .summary > .tests > .unit,
     .root > .summary > .passed > .unit,
