@@ -117,7 +117,8 @@ const saveResult = (
   { name: screenshotName }: Scenario,
   result: CompareScenarioResult
 ): Promise<void> => {
-  const resultJSON = pathJoin(compared, screenshotName + '.json');
+  const screenshotsDirectory = pathJoin(compared, 'screenshots');
+  const resultJSON = pathJoin(screenshotsDirectory, screenshotName + '.json');
   if (result.type === 'no_approved') {
     return fs.outputJSON(resultJSON, { result: result.type });
   } else if (result.type === 'no_captured') {
@@ -130,7 +131,7 @@ const saveResult = (
   } else if (result.type === 'not_same') {
     return fs.outputJSON(resultJSON, { result: result.type })
       .then(() => {
-        const resultPNG = pathJoin(compared, screenshotName + '.png');
+        const resultPNG = pathJoin(screenshotsDirectory, screenshotName + '.png');
         return saveImage(resultPNG, result.diffImage);
       });
   } else if (result.type === 'same') {

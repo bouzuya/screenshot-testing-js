@@ -348,7 +348,7 @@ const generateReport = (
     scenario: Scenario;
   }>
 ): Promise<void> => {
-  const reportDirPath = '.tmp/report/';
+  const reportDirPath = pathJoin(compared, 'report');
   const reportHtmlPath = pathJoin(reportDirPath, 'report.html');
   const reportJsPath = pathJoin(reportDirPath, 'report.js');
   const viewData: ViewData = {
@@ -364,7 +364,7 @@ const generateReport = (
       );
       const comparedPath = pathRelative(
         reportDirPath,
-        pathJoin(compared, scenario.name + '.png')
+        pathJoin(compared, 'screenshots', scenario.name + '.png')
       );
       const approvedUrl =
         result.type === 'no_captured' || result.type === 'no_approved'
