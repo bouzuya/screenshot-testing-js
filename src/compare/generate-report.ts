@@ -60,7 +60,10 @@ const html = (scriptPath: string): string => {
         });
         return e;
       };
-      const view = ({ allCount, details, failedCount, passedCount }, { click }) => {
+      const view = (
+        { allCount, details, failedCount, passedCount },
+        { closeDialog, openDialog }
+      ) => {
         return h('div', { class: 'root' }, [
           h('div', { class: 'summary' }, [
             h('div', { class: 'tests' }, [
@@ -80,7 +83,10 @@ const html = (scriptPath: string): string => {
             h('ul', {}, details.map((detail) => {
               const { comparedUrl, name, type } = detail;
               return h('li', {}, [
-                h('div', { class: 'detail', on: { click: click(detail) } }, [
+                h('div', {
+                  class: 'detail',
+                  on: { click: openDialog(detail, { closeDialog }) }
+                }, [
                   h('header', {}, [
                     h('div', { class: 'name' }, [name]),
                     h('div', { class: 'type' }, [type]),
@@ -96,17 +102,19 @@ const html = (scriptPath: string): string => {
         ]);
       };
 
-      const close = () => {
-        const dialog = document.querySelector('.dialog');
-        dialog.classList.remove('is-visible');
-        setTimeout(() => {
-          const container = document.querySelector('.dialog-container');
-          while (container.hasChildNodes()) {
-            container.removeChild(container.firstChild);
-          }
-        }, 300);
+      const closeDialog = () => {
+        return (_) => {
+          const dialog = document.querySelector('.dialog');
+          dialog.classList.remove('is-visible');
+          setTimeout(() => {
+            const container = document.querySelector('.dialog-container');
+            while (container.hasChildNodes()) {
+              container.removeChild(container.firstChild);
+            }
+          }, 300);
+        };
       };
-      const click = (detail) => {
+      const openDialog = (detail, { closeDialog }) => {
         return (event) => {
           const { approvedUrl, capturedUrl, name, type } = detail;
           const dialog = h('div', { class: 'dialog' }, [
@@ -115,7 +123,7 @@ const html = (scriptPath: string): string => {
                 h('header', {}, [
                   h('div', { class: 'name' }, [name]),
                   h('div', { class: 'type' }, [type]),
-                  h('button', { class: 'close', on: { click: close } }, ['X'])
+                  h('button', { class: 'close', on: { click: closeDialog() } }, ['X'])
                 ]),
                 h('div', { class: 'body' }, [
                   h('div', { class: 'left' }, [
@@ -142,7 +150,7 @@ const html = (scriptPath: string): string => {
           setTimeout(() => dialog.classList.add('is-visible'), 100);
         };
       };
-      const root = view(ScreenshotTesting, { click });
+      const root = view(ScreenshotTesting, { closeDialog, openDialog });
       const body = document.querySelector('.body');
       body.appendChild(root);
     });
