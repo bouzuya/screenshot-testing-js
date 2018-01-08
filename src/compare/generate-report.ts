@@ -1,4 +1,5 @@
 import * as fs from 'fs-extra';
+import * as open from 'open';
 import { join as pathJoin, relative as pathRelative } from 'path';
 import { Options } from '../data/options';
 import { Scenario } from '../data/scenario';
@@ -396,7 +397,7 @@ const generateReport = (
   return Promise.all([
     fs.outputFile(reportHtmlPath, html(pathRelative(reportDirPath, reportJsPath))),
     fs.outputFile(reportJsPath, js(viewData))
-  ]).then(() => void 0);
+  ]).then(() => void open(reportHtmlPath));
 };
 
 export { generateReport };
