@@ -232,13 +232,6 @@ const html = (scriptPath: string): string => {
       top: 2%;
       box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window:focus,
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window:hover {
-      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-    }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window:active {
-      box-shadow: unset;
-    }
     .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header {
       box-sizing: border-box;
       height: 64px;
