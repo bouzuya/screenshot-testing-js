@@ -95,6 +95,16 @@ const html = (scriptPath: string): string => {
         ]);
       };
 
+      const close = () => {
+        const dialog = document.querySelector('.dialog');
+        dialog.classList.remove('is-visible');
+        setTimeout(() => {
+          const container = document.querySelector('.dialog-container');
+          while (container.hasChildNodes()) {
+            container.removeChild(container.firstChild);
+          }
+        }, 300);
+      };
       const click = (detail) => {
         return (event) => {
           const { approvedUrl, capturedUrl, name, type } = detail;
@@ -103,7 +113,8 @@ const html = (scriptPath: string): string => {
               h('div', { class: 'dialog-window' }, [
                 h('header', {}, [
                   h('div', { class: 'name' }, [name]),
-                  h('div', { class: 'type' }, [type])
+                  h('div', { class: 'type' }, [type]),
+                  h('button', { class: 'close', on: { click: close } }, ['X'])
                 ]),
                 h('div', { class: 'body' }, [
                   h('div', { class: 'left' }, [
@@ -119,7 +130,7 @@ const html = (scriptPath: string): string => {
                     h('div', { class: 'label' }, ['Captured'])
                   ])
                 ])
-            ])
+              ])
             ])
           ]);
           const container = document.querySelector('.dialog-container');
@@ -228,25 +239,47 @@ const html = (scriptPath: string): string => {
     .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window:active {
       box-shadow: unset;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header {
       box-sizing: border-box;
       height: 64px;
       padding: 8px 0 0 0;
       text-align: center;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header > .name,
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header > .type {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .name,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .type {
       padding: 0 8px;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .close {
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      border: 2px solid #000;
+      background-color: transparent;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 100%;
+      height: 40px;
+      padding: 0;
+      position: absolute;
+      right: 8px;
+      text-align: center;
+      top: 8px;
+      width: 40px;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .close:focus,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .close:hover {
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .close:active {
+      box-shadow: unset;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body {
       bottom: 0;
       left: 0;
       position: absolute;
       right: 0;
       top: 64px;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left,
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right {
       background-color: #fff;
       height: 100%;
       overflow: hidden;
@@ -255,18 +288,18 @@ const html = (scriptPath: string): string => {
       left: 0;
       width: 100%;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left {
       background-color: #fcc;
       border-right: 2px solid #000;
       width: 50%;
       z-index: 10;
       resize: horizontal;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right {
       background-color: #ccf;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .image,
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .image {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .image,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .image {
       -moz-user-select: none;
       display: flex;
       height: 100%;
@@ -274,22 +307,22 @@ const html = (scriptPath: string): string => {
       user-select: none;
       width: 96vw; /* ignore parent width */
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .image > img,
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .image > img {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .image > img,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .image > img {
       object-fit: contain;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .label,
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .label {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .label,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .label {
       display: inline-block;
       font-size: 90%;
       padding: 8px;
       position: absolute;
       top: 0;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .label {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .label {
       left: 0;
     }
-    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .label {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .label {
       right: 0;
     }
   </style>
