@@ -35,7 +35,16 @@ const html = (scriptPath: string): string => {
           .keys(attrs)
           .map((name) => ({ name, value: attrs[name] }))
           .forEach(({ name, value }) => {
-            e.setAttribute(name, value);
+            if (name === 'on') {
+              Object
+                .keys(value)
+                .map((eventName) => ({ eventName, listener: value[eventName] }))
+                .forEach(({ eventName, listener }) => {
+                  e.addEventListener(eventName, listener);
+                });
+            } else {
+              e.setAttribute(name, value);
+            }
           });
         children.forEach((child) => {
           if (typeof child === 'undefined' || child === null) {
@@ -50,7 +59,7 @@ const html = (scriptPath: string): string => {
         });
         return e;
       };
-      const view = ({ allCount, details, failedCount, passedCount }) => {
+      const view = ({ allCount, details, failedCount, passedCount }, { click }) => {
         return h('div', { class: 'root' }, [
           h('div', { class: 'summary' }, [
             h('div', { class: 'tests' }, [
@@ -67,24 +76,61 @@ const html = (scriptPath: string): string => {
             ])
           ]),
           h('div', { class: 'details' }, [
-            h('ul', {}, details.map(({ comparedUrl, name, type }) => {
+            h('ul', {}, details.map((detail) => {
+              const { comparedUrl, name, type } = detail;
               return h('li', {}, [
-                h('div', { class: 'detail' }, [
+                h('div', { class: 'detail', on: { click: click(detail) } }, [
                   h('header', {}, [
                     h('div', { class: 'name' }, [name]),
                     h('div', { class: 'type' }, [type]),
                   ]),
                   h('div', { class: 'body' }, [
-                    h('img', { src: comparedUrl }, [])
+                    h('img', { class: 'compared', src: comparedUrl }, [])
                   ])
                 ])
               ]);
             }))
-          ])
+          ]),
+          h('div', { class: 'dialog-container' }, [])
         ]);
       };
 
-      const root = view(ScreenshotTesting);
+      const click = (detail) => {
+        return (event) => {
+          const { approvedUrl, capturedUrl, name, type } = detail;
+          const dialog = h('div', { class: 'dialog' }, [
+            h('div', { class: 'dialog-overlay' }, [
+              h('div', { class: 'dialog-window' }, [
+                h('header', {}, [
+                  h('div', { class: 'name' }, [name]),
+                  h('div', { class: 'type' }, [type]),
+                ]),
+                h('div', { class: 'body' }, [
+                  h('div', { class: 'left' }, [
+                    h('div', { class: 'image' }, [
+                      h('img', { class: 'approved', src: approvedUrl }, []),
+                    ]),
+                    h('div', { class: 'label' }, ['Approved'])
+                  ]),
+                  h('div', { class: 'right' }, [
+                    h('div', { class: 'image' }, [
+                      h('img', { class: 'captured', src: capturedUrl }, [])
+                    ]),
+                    h('div', { class: 'label' }, ['Captured'])
+                  ])
+                ])
+            ])
+            ])
+          ]);
+          const container = document.querySelector('.dialog-container');
+          while (container.hasChildNodes()) {
+            container.removeChild(container.firstChild);
+          }
+          container.appendChild(dialog);
+          setTimeout(() => dialog.classList.add('is-visible'), 100);
+        };
+      };
+      const root = view(ScreenshotTesting, { click });
       const body = document.querySelector('.body');
       body.appendChild(root);
     });
@@ -151,6 +197,87 @@ const html = (scriptPath: string): string => {
     }
     .root > .details > ul > li > .detail > .body > img {
       object-fit: contain;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window {
+      background-color: #fff;
+      border: 2px solid #000;
+      box-sizing: border-box;
+      height: 96%;
+      left: 2%;
+      position: absolute;
+      top: -100%;
+      transition: top 0.3s ease;
+      width: 96%;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window {
+      top: 2%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window:focus,
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window:hover {
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window:active {
+      box-shadow: unset;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > header {
+      box-sizing: border-box;
+      height: 64px;
+      padding: 8px;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 64px;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left,
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right {
+      height: 100%;
+      overflow: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left {
+      border-right: 1px solid #000;
+      width: 50%;
+      z-index: 10;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .image,
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .image {
+      display: flex;
+      height: 100%;
+      justify-content: center;
+      width: 96vw; /* ignore parent width */
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .image > img,
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .image > img {
+      object-fit: contain;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .label,
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .label {
+      display: inline-block;
+      font-size: 90%;
+      padding: 8px;
+      position: absolute;
+      top: 0;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .left > .label {
+      left: 0;
+    }
+    .root > .dialog-container > .dialog.is-visible > .dialog-overlay > .dialog-window > .body > .right > .label {
+      right: 0;
     }
   </style>
 </head>
