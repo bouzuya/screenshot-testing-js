@@ -43,7 +43,7 @@ const html = (scriptPath: string): string => {
                 .forEach(({ eventName, listener }) => {
                   e.addEventListener(eventName, listener);
                 });
-            } else {
+            } else if (value !== null) {
               e.setAttribute(name, value);
             }
           });
@@ -482,13 +482,13 @@ const generateReport = (
           ? null
           : capturedPath;
       const comparedUrl =
-        result.type === 'no_captured' ||
-          result.type === 'no_approved' ||
-          result.type === 'not_same_dimension'
+        result.type === 'no_captured' || result.type === 'not_same_dimension'
           ? null
-          : result.type === 'same'
-            ? approvedPath
-            : comparedPath;
+          : result.type === 'no_approved'
+            ? capturedPath
+            : result.type === 'same'
+              ? approvedPath
+              : comparedPath;
       return {
         approvedUrl,
         capturedUrl,
