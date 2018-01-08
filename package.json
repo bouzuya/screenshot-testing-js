@@ -1,7 +1,7 @@
 {
   "name": "@bouzuya/screenshot-testing",
   "description": "A screenshot testing tool for JavaScript (Node.js)",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": {
     "email": "m@bouzuya.net",
     "name": "bouzuya",
