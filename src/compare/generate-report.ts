@@ -62,26 +62,36 @@ const html = (scriptPath: string): string => {
       };
       // create view
       const view = (
-        { allCount, details, failedCount, filter, passedCount },
+        {
+          filter,
+          filterFn,
+          results: { allCount, details, failedCount, passedCount }
+        },
         { closeDialog, filterAll, filterFailed, filterPassed, openDialog }
       ) => {
         return h('div', { class: 'root' }, [
           h('div', { class: 'summary' }, [
-            h('div', { class: 'tests' }, [
+            h('div', {
+              class: 'tests' + (filter === 'all' ? ' current' : '')
+            }, [
               h('span', {
                 class: 'value',
                 on: { click: filterAll() }
               }, [allCount]),
               h('span', { class: 'unit' }, ['tests'])
             ]),
-            h('div', { class: 'passed' }, [
+            h('div', {
+              class: 'passed' + (filter === 'passed' ? ' current' : '')
+            }, [
               h('span', {
                 class: 'value',
                 on: { click: filterPassed() }
               }, [passedCount]),
               h('span', { class: 'unit' }, ['passed'])
             ]),
-            h('div', { class: 'failed' }, [
+            h('div', {
+              class: 'failed' + (filter === 'failed' ? ' current' : '')
+            }, [
               h('span', {
                 class: 'value',
                 on: { click: filterFailed() }
@@ -90,7 +100,7 @@ const html = (scriptPath: string): string => {
             ])
           ]),
           h('div', { class: 'details' }, [
-            h('ul', {}, details.filter((i) => filter(i)).map((detail) => {
+            h('ul', {}, details.filter((i) => filterFn(i)).map((detail) => {
               const { comparedUrl, name, type } = detail;
               return h('li', {}, [
                 h('div', {
@@ -114,8 +124,8 @@ const html = (scriptPath: string): string => {
       // render / re-render
       const render = (state) => {
         const root = view(
-          Object.assign({}, state.results, {
-            filter: state.filter === 'all'
+          Object.assign({}, state, {
+            filterFn: state.filter === 'all'
               ? (_) => true
               : state.filter === 'failed'
                 ? (i) => i.type !== 'same'
@@ -236,6 +246,21 @@ const html = (scriptPath: string): string => {
       box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
       cursor: pointer;
       padding: 8px;
+    }
+    .root > .summary > .tests.current > .value,
+    .root > .summary > .tests.current > .value:focus,
+    .root > .summary > .tests.current > .value:hover,
+    .root > .summary > .tests.current > .value:active,
+    .root > .summary > .passed.current > .value,
+    .root > .summary > .passed.current > .value:focus,
+    .root > .summary > .passed.current > .value:hover,
+    .root > .summary > .passed.current > .value:active,
+    .root > .summary > .failed.current > .value,
+    .root > .summary > .failed.current > .value:focus,
+    .root > .summary > .failed.current > .value:hover,
+    .root > .summary > .failed.current > .value:active {
+      box-shadow: unset;
+      cursor: default;
     }
     .root > .summary > .tests > .value:focus,
     .root > .summary > .tests > .value:hover,
