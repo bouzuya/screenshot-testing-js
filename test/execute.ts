@@ -16,7 +16,7 @@ const setUp = () => {
       './compare': { compare }
     }
   ).execute;
-  const options = {} as any; // TODO
+  const options = { foo: 123 } as any; // TODO
   return {
     approve,
     capture,
@@ -38,6 +38,8 @@ const tests: Test[] = [
     } = setUp();
     return execute('approve', options).then(() => {
       assert(approve.callCount === 1);
+      assert(approve.getCall(0).args.length === 1);
+      assert.deepEqual(approve.getCall(0).args[0], options);
       assert(capture.callCount === 0);
       assert(compare.callCount === 0);
     });
@@ -53,6 +55,8 @@ const tests: Test[] = [
     return execute('capture', options).then(() => {
       assert(approve.callCount === 0);
       assert(capture.callCount === 1);
+      assert(capture.getCall(0).args.length === 1);
+      assert.deepEqual(capture.getCall(0).args[0], options);
       assert(compare.callCount === 0);
     });
   }),
@@ -68,6 +72,8 @@ const tests: Test[] = [
       assert(approve.callCount === 0);
       assert(capture.callCount === 0);
       assert(compare.callCount === 1);
+      assert(compare.getCall(0).args.length === 1);
+      assert.deepEqual(compare.getCall(0).args[0], options);
     });
   }),
   test(category + 'test', () => {
@@ -81,7 +87,11 @@ const tests: Test[] = [
     return execute('test', options).then(() => {
       assert(approve.callCount === 0);
       assert(capture.callCount === 1);
+      assert(capture.getCall(0).args.length === 1);
+      assert.deepEqual(capture.getCall(0).args[0], options);
       assert(compare.callCount === 1);
+      assert(compare.getCall(0).args.length === 1);
+      assert.deepEqual(compare.getCall(0).args[0], options);
     });
   })
 ];
