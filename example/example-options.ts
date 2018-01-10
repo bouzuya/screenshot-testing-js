@@ -1,6 +1,5 @@
 import * as puppeteer from 'puppeteer';
-import { Options } from '../src/data/options'; // FIXME
-import { Scenario } from '../src/data/scenario'; // FIXME
+import { Options, Scenario } from '../src'; // @bouzuya/screenshot-testing
 import { format } from './format';
 
 const ensureKey = (tmpl: string, key: string): string => {
