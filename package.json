@@ -51,7 +51,7 @@
   "homepage": "https://github.com/bouzuya/screenshot-testing-js#readme",
   "keywords": [],
   "license": "MIT",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bouzuya/screenshot-testing-js.git"
@@ -73,5 +73,6 @@
     "watch:es2015": "npm run build:es2015 -- --watch",
     "watch:es5": "npm run build:es5 -- --watch",
     "watch:test": "watch \"npm run test\" \".tmp/es5/\""
-  }
+  },
+  "types": "lib/index.d.ts"
 }
