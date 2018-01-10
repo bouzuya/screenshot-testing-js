@@ -94,6 +94,31 @@ const scenario2 = (): Scenario => {
   };
 };
 
+const scenario3 = (): Scenario => {
+  const baseName = 'scenario3';
+  const language = 'ja';
+  const url = 'https://blog.bouzuya.net/2017/01/02/';
+  const viewport = '1024x768';
+  const {
+    name: languageNameHelper,
+    page: languagePageHelper
+  } = languageHelper(language);
+  const {
+    name: viewportNameHelper,
+    page: viewportPageHelper
+  } = viewportHelper(viewport);
+  const name = viewportNameHelper(languageNameHelper(baseName));
+  return {
+    action: async (page) => {
+      await languagePageHelper(page);
+      await viewportPageHelper(page);
+      await page.goto(url);
+      return {};
+    },
+    name
+  };
+};
+
 const newExampleOptions = (): Options => {
   return {
     path: {
@@ -103,7 +128,8 @@ const newExampleOptions = (): Options => {
     },
     scenarios: [
       scenario1(),
-      scenario2()
+      scenario2(),
+      scenario3()
     ]
   };
 };

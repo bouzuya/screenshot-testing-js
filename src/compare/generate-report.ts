@@ -315,6 +315,7 @@ const html = (scriptPath: string): string => {
     }
     .root > .details > ul > li > .detail > .body > img {
       object-fit: contain;
+      max-width: 100%;
     }
     .root > .dialog-container > .dialog > .dialog-overlay {
       bottom: 0;
@@ -410,6 +411,7 @@ const html = (scriptPath: string): string => {
     .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .image > img,
     .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .image > img {
       object-fit: contain;
+      max-width: 100%;
     }
     .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .label,
     .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .label {
