@@ -3,8 +3,10 @@ import {
   Image,
   Result,
   compareImages as originalCompareImages,
+  getAllPixelCount,
   getDiffDimension,
   getDiffImage,
+  getDiffPixelCount,
   isSame,
   isSameDimension
 } from '@bouzuya/compare-images';
@@ -38,7 +40,10 @@ export interface CompareScenarioResultNotSameDimension {
 
 export interface CompareScenarioResultNotSame {
   type: 'not_same';
+  allPixelCount: number;
   diffImage: Image;
+  diffPercentage: number;
+  diffPixelCount: number;
 }
 
 export interface CompareScenarioResultSame {
@@ -87,8 +92,15 @@ const compareScenario = async (
         type: 'not_same_dimension'
       };
     } else if (!isSame(result)) {
+      const allPixelCount = getAllPixelCount(result);
+      const diffPixelCount = getDiffPixelCount(result);
       return {
+        allPixelCount,
         diffImage: getDiffImage(result),
+        diffPercentage: allPixelCount === 0
+          ? 0
+          : diffPixelCount / allPixelCount * 100,
+        diffPixelCount,
         type: 'not_same'
       };
     } else {
@@ -129,7 +141,12 @@ const saveResult = (
       result: result.type
     });
   } else if (result.type === 'not_same') {
-    return fs.outputJSON(resultJSON, { result: result.type })
+    return fs.outputJSON(resultJSON, {
+      allPixelCount: result.allPixelCount,
+      diffPercentage: result.diffPercentage,
+      diffPixelCount: result.diffPixelCount,
+      result: result.type
+    })
       .then(() => {
         const resultPNG = pathJoin(screenshotsDirectory, screenshotName + '.png');
         return saveImage(resultPNG, result.diffImage);

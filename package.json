@@ -16,7 +16,7 @@
     "url": "https://github.com/bouzuya/screenshot-testing-js/issues"
   },
   "dependencies": {
-    "@bouzuya/compare-images": "^0.1.1",
+    "@bouzuya/compare-images": "^0.2.0",
     "fs-extra": "^5.0.0",
     "open": "0.0.5",
     "pngjs": "^3.3.1",
