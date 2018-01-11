@@ -12,6 +12,7 @@ interface ViewData {
     capturedUrl: string | null;
     comparedUrl: string | null;
     name: Scenario['name'];
+    stats: string;
     type: CompareScenarioResult['type'];
   }>;
   failedCount: number;
@@ -178,16 +179,22 @@ const html = (scriptPath: string): string => {
       };
       const openDialog = (detail, { closeDialog }) => {
         return (event) => {
-          const { approvedUrl, capturedUrl, name, type } = detail;
-          const dialog = h('div', { class: 'dialog' }, [
-            h('div', { class: 'dialog-overlay' }, [
-              h('div', { class: 'dialog-window' }, [
-                h('header', {}, [
-                  h('div', { class: 'name' }, [name]),
-                  h('div', { class: 'type' }, [type]),
-                  h('button', { class: 'close', on: { click: closeDialog() } }, ['X'])
+          const renderWindow = (bodyType) => {
+            const { approvedUrl, capturedUrl, name, type, stats } = detail;
+            const window = h('div', { class: 'dialog-window' }, [
+              h('header', {}, [
+                h('div', { class: 'name' }, [name]),
+                h('div', { class: 'type' }, [type]),
+                h('div', { class: 'meta' }, [
+                  h('ul', { class: (bodyType === 'image' ? 'is-image' : 'is-stats') }, [
+                    h('li', {}, [h('span', { class: 'image', on: { click: () => renderWindow('image') } }, ['image'])]),
+                    h('li', {}, [h('span', { class: 'stats', on: { click: () => renderWindow('stats') } }, ['stats'])]),
+                  ])
                 ]),
-                h('div', { class: 'body' }, [
+                h('button', { class: 'close', on: { click: closeDialog() } }, ['X'])
+              ]),
+              h('div', { class: 'body' + (bodyType === 'image' ? ' is-image' : ' is-stats') }, [
+                h('div', { class: 'image' }, [
                   h('div', { class: 'left' }, [
                     h('div', { class: 'image' }, [
                       h('img', { class: 'approved', src: approvedUrl }, []),
@@ -200,9 +207,18 @@ const html = (scriptPath: string): string => {
                     ]),
                     h('div', { class: 'label' }, ['Captured'])
                   ])
-                ])
+                ]),
+                h('div', { class: 'stats' }, [stats])
               ])
-            ])
+            ]);
+            const container = document.querySelector('.dialog-overlay');
+            while (container.hasChildNodes()) {
+              container.removeChild(container.firstChild);
+            }
+            container.appendChild(window);
+          };
+          const dialog = h('div', { class: 'dialog' }, [
+            h('div', { class: 'dialog-overlay' }, [ /* render window */ ])
           ]);
           const container = document.querySelector('.dialog-container');
           while (container.hasChildNodes()) {
@@ -210,6 +226,7 @@ const html = (scriptPath: string): string => {
           }
           container.appendChild(dialog);
           setTimeout(() => dialog.classList.add('is-visible'), 100);
+          renderWindow('image');
         };
       };
 
@@ -342,7 +359,7 @@ const html = (scriptPath: string): string => {
     }
     .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header {
       box-sizing: border-box;
-      height: 64px;
+      height: 96px;
       padding: 8px 0 0 0;
       text-align: center;
     }
@@ -372,15 +389,63 @@ const html = (scriptPath: string): string => {
     .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .close:active {
       box-shadow: unset;
     }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul {
+      display: flex;
+      justify-content: center;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li {
+      padding: 8px;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li > .image,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li > .stats {
+      border: 2px solid #000;
+      cursor: pointer;
+      display: inline-block;
+      padding: 8px;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header
+    > .meta > ul.is-image > li > .image,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header
+    > .meta > ul.is-stats > li > .stats {
+      box-shadow: unset;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header
+    > .meta > ul.is-image > li > .image:focus,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header
+    > .meta > ul.is-image > li > .image:hover,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header
+    > .meta > ul.is-stats > li > .stats:focus,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header
+    > .meta > ul.is-stats > li > .stats:hover {
+      box-shadow: unset;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li > .image:focus,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li > .image:hover,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li > .stats:focus,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li > .stats:hover {
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li > .image:active,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > header > .meta > ul > li > .stats:active {
+        box-shadow: unset;
+    }
     .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body {
       bottom: 0;
       left: 0;
       position: absolute;
       right: 0;
-      top: 64px;
+      top: 96px;
     }
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left,
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body.is-stats > .image,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body.is-image > .stats {
+      display: none;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .left,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .right {
       background-color: #fff;
       height: 100%;
       overflow: hidden;
@@ -389,18 +454,18 @@ const html = (scriptPath: string): string => {
       left: 0;
       width: 100%;
     }
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .left {
       background-color: #fcc;
       border-right: 2px solid #000;
       width: 50%;
       z-index: 10;
       resize: horizontal;
     }
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .right {
       background-color: #ccf;
     }
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .image,
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .image {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .left > .image,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .right > .image {
       -moz-user-select: none;
       display: flex;
       height: 100%;
@@ -408,24 +473,30 @@ const html = (scriptPath: string): string => {
       user-select: none;
       width: 96vw; /* ignore parent width */
     }
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .image > img,
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .image > img {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .left > .image > img,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .right > .image > img {
       object-fit: contain;
       max-width: 100%;
     }
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .label,
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .label {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .left > .label,
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .right > .label {
       display: inline-block;
       font-size: 90%;
       padding: 8px;
       position: absolute;
       top: 0;
     }
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .left > .label {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .left > .label {
       left: 0;
     }
-    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .right > .label {
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .image > .right > .label {
       right: 0;
+    }
+    .root > .dialog-container > .dialog > .dialog-overlay > .dialog-window > .body > .stats {
+      background-color: #eee;
+      min-height: 100%;
+      padding: 8px;
+      white-space: pre;
     }
   </style>
 </head>
@@ -491,11 +562,14 @@ const generateReport = (
             : result.type === 'same'
               ? approvedPath
               : comparedPath;
+      const stats = Object.assign({}, result);
+      delete (stats as any).diffImage;
       return {
         approvedUrl,
         capturedUrl,
         comparedUrl,
         name: scenario.name,
+        stats: JSON.stringify(stats, null, 2),
         type: result.type
       };
     }),
