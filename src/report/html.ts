@@ -519,71 +519,78 @@ const js = (viewData: any): string => {
   return `window.ScreenshotTesting = ${JSON.stringify(viewData)};`;
 };
 
-const report = (
-  {
-    path: { approved, captured, compared }
-  }: Options,
-  results: Array<{
-    result: CompareScenarioResult;
-    scenario: Scenario;
-  }>
-): Promise<void> => {
-  const passedFn = (x: {
-    result: CompareScenarioResult;
-    scenario: Scenario;
-  }) => x.result.type === 'same';
-  const reportDirPath = pathJoin(compared, 'report');
-  const reportHtmlPath = pathJoin(reportDirPath, 'report.html');
-  const reportJsPath = pathJoin(reportDirPath, 'report.js');
-  const viewData: ViewData = {
-    allCount: results.length,
-    details: results.map(({ result, scenario }) => {
-      const approvedPath = pathRelative(
-        reportDirPath,
-        pathJoin(approved, scenario.name + '.png')
-      );
-      const capturedPath = pathRelative(
-        reportDirPath,
-        pathJoin(captured, scenario.name + '.png')
-      );
-      const comparedPath = pathRelative(
-        reportDirPath,
-        pathJoin(compared, 'screenshots', scenario.name + '.png')
-      );
-      const approvedUrl =
-        result.type === 'no_captured' || result.type === 'no_approved'
-          ? null
-          : approvedPath;
-      const capturedUrl =
-        result.type === 'no_captured'
-          ? null
-          : capturedPath;
-      const comparedUrl =
-        result.type === 'no_captured' || result.type === 'not_same_dimension'
-          ? null
-          : result.type === 'no_approved'
-            ? capturedPath
-            : result.type === 'same'
-              ? approvedPath
-              : comparedPath;
-      const stats = Object.assign({}, result);
-      delete (stats as any).diffImage;
-      return {
-        approvedUrl,
-        capturedUrl,
-        comparedUrl,
-        name: scenario.name,
-        stats: JSON.stringify(stats, null, 2),
-        type: result.type
-      };
-    }),
-    failedCount: results.filter((i) => !passedFn(i)).length,
-    passedCount: results.filter((i) => passedFn(i)).length
+const report = (reportOptions: { open: 'always' | 'failed' | 'never' }) => {
+  return (
+    {
+      path: { approved, captured, compared }
+    }: Options,
+    results: Array<{
+      result: CompareScenarioResult;
+      scenario: Scenario;
+    }>
+  ): Promise<void> => {
+    const passedFn = (x: {
+      result: CompareScenarioResult;
+      scenario: Scenario;
+    }) => x.result.type === 'same';
+    const reportDirPath = pathJoin(compared, 'report');
+    const reportHtmlPath = pathJoin(reportDirPath, 'report.html');
+    const reportJsPath = pathJoin(reportDirPath, 'report.js');
+    const viewData: ViewData = {
+      allCount: results.length,
+      details: results.map(({ result, scenario }) => {
+        const approvedPath = pathRelative(
+          reportDirPath,
+          pathJoin(approved, scenario.name + '.png')
+        );
+        const capturedPath = pathRelative(
+          reportDirPath,
+          pathJoin(captured, scenario.name + '.png')
+        );
+        const comparedPath = pathRelative(
+          reportDirPath,
+          pathJoin(compared, 'screenshots', scenario.name + '.png')
+        );
+        const approvedUrl =
+          result.type === 'no_captured' || result.type === 'no_approved'
+            ? null
+            : approvedPath;
+        const capturedUrl =
+          result.type === 'no_captured'
+            ? null
+            : capturedPath;
+        const comparedUrl =
+          result.type === 'no_captured' || result.type === 'not_same_dimension'
+            ? null
+            : result.type === 'no_approved'
+              ? capturedPath
+              : result.type === 'same'
+                ? approvedPath
+                : comparedPath;
+        const stats = Object.assign({}, result);
+        delete (stats as any).diffImage;
+        return {
+          approvedUrl,
+          capturedUrl,
+          comparedUrl,
+          name: scenario.name,
+          stats: JSON.stringify(stats, null, 2),
+          type: result.type
+        };
+      }),
+      failedCount: results.filter((i) => !passedFn(i)).length,
+      passedCount: results.filter((i) => passedFn(i)).length
+    };
+    return Promise.all([
+      fs.outputFile(reportHtmlPath, html(pathRelative(reportDirPath, reportJsPath))),
+      fs.outputFile(reportJsPath, js(viewData))
+    ]).then(() => {
+      if (
+        reportOptions.open === 'always' ||
+        (reportOptions.open === 'failed' && viewData.failedCount > 0)
+      ) open(reportHtmlPath);
+    });
   };
-  return Promise.all([
-    fs.outputFile(reportHtmlPath, html(pathRelative(reportDirPath, reportJsPath))),
-    fs.outputFile(reportJsPath, js(viewData))
-  ]).then(() => void open(reportHtmlPath));
 };
 
 export { report };

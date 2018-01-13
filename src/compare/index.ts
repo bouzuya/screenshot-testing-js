@@ -1,7 +1,7 @@
 import { CompareScenarioResult } from '../data/compare-scenario-result';
 import { Options } from '../data/options';
 import { Scenario } from '../data/scenario';
-import { report } from '../report/html';
+import { report as htmlReport } from '../report/html';
 import { compareScenario } from './compare-scenario';
 
 const compare = (options: Options): Promise<void> => {
@@ -17,7 +17,7 @@ const compare = (options: Options): Promise<void> => {
       result: CompareScenarioResult;
       scenario: Scenario;
     }>))
-    .then((results) => report(options, results));
+    .then((results) => htmlReport({ open: 'always' })(options, results));
 };
 
 export { compare };
