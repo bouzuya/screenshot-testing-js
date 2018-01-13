@@ -1,5 +1,4 @@
 import {
-  Dimension,
   Image,
   Result,
   compareImages as originalCompareImages,
@@ -12,47 +11,11 @@ import {
 } from '@bouzuya/compare-images';
 import * as fs from 'fs-extra';
 import { join as pathJoin } from 'path';
+import { CompareScenarioResult } from '../data/compare-scenario-result';
 import { Options } from '../data/options';
 import { Scenario } from '../data/scenario';
 import { ensureError, isNoImageError } from './error';
 import { loadImage, saveImage } from './image-io';
-
-export type CompareScenarioResult =
-  CompareScenarioResultNoApproved |
-  CompareScenarioResultNoCaptured |
-  CompareScenarioResultNotSameDimension |
-  CompareScenarioResultNotSame |
-  CompareScenarioResultSame |
-  CompareScenarioResultUnknown;
-
-export interface CompareScenarioResultNoApproved {
-  type: 'no_approved';
-}
-
-export interface CompareScenarioResultNoCaptured {
-  type: 'no_captured';
-}
-
-export interface CompareScenarioResultNotSameDimension {
-  type: 'not_same_dimension';
-  diffDimension: Dimension;
-}
-
-export interface CompareScenarioResultNotSame {
-  type: 'not_same';
-  allPixelCount: number;
-  diffImage: Image;
-  diffPercentage: number;
-  diffPixelCount: number;
-}
-
-export interface CompareScenarioResultSame {
-  type: 'same';
-}
-
-export interface CompareScenarioResultUnknown {
-  type: 'unknown';
-}
 
 const compareImages = (
   image1: Image,

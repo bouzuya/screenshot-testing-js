@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import open = require('open');
 import { join as pathJoin, relative as pathRelative } from 'path';
-import { CompareScenarioResult } from '../compare/compare-scenario';
+import { CompareScenarioResult } from '../data/compare-scenario-result';
 import { Options } from '../data/options';
 import { Scenario } from '../data/scenario';
 

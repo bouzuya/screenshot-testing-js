@@ -1,7 +1,8 @@
+import { CompareScenarioResult } from '../data/compare-scenario-result';
 import { Options } from '../data/options';
 import { Scenario } from '../data/scenario';
 import { report } from '../report/html';
-import { CompareScenarioResult, compareScenario } from './compare-scenario';
+import { compareScenario } from './compare-scenario';
 
 const compare = (options: Options): Promise<void> => {
   const { scenarios } = options;
