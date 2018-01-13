@@ -528,6 +528,10 @@ const generateReport = (
     scenario: Scenario;
   }>
 ): Promise<void> => {
+  const passedFn = (x: {
+    result: CompareScenarioResult;
+    scenario: Scenario;
+  }) => x.result.type === 'same';
   const reportDirPath = pathJoin(compared, 'report');
   const reportHtmlPath = pathJoin(reportDirPath, 'report.html');
   const reportJsPath = pathJoin(reportDirPath, 'report.js');
@@ -573,8 +577,8 @@ const generateReport = (
         type: result.type
       };
     }),
-    failedCount: results.filter((i) => i.result.type !== 'same').length,
-    passedCount: results.filter((i) => i.result.type === 'same').length
+    failedCount: results.filter((i) => !passedFn(i)).length,
+    passedCount: results.filter((i) => passedFn(i)).length
   };
   return Promise.all([
     fs.outputFile(reportHtmlPath, html(pathRelative(reportDirPath, reportJsPath))),
