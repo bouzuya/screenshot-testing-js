@@ -1,9 +1,9 @@
 import * as fs from 'fs-extra';
 import open = require('open');
 import { join as pathJoin, relative as pathRelative } from 'path';
+import { CompareScenarioResult } from '../compare/compare-scenario';
 import { Options } from '../data/options';
 import { Scenario } from '../data/scenario';
-import { CompareScenarioResult } from './compare-scenario';
 
 interface ViewData {
   allCount: number;
@@ -519,7 +519,7 @@ const js = (viewData: any): string => {
   return `window.ScreenshotTesting = ${JSON.stringify(viewData)};`;
 };
 
-const generateHtmlReport = (
+const report = (
   {
     path: { approved, captured, compared }
   }: Options,
@@ -586,4 +586,4 @@ const generateHtmlReport = (
   ]).then(() => void open(reportHtmlPath));
 };
 
-export { generateHtmlReport };
+export { report };
