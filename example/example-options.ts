@@ -1,5 +1,5 @@
 import * as puppeteer from 'puppeteer';
-import { Options, Scenario } from '../src'; // @bouzuya/screenshot-testing
+import { Options, Scenario, htmlReport } from '../src'; // @bouzuya/screenshot-testing
 import { format } from './format';
 
 const ensureKey = (tmpl: string, key: string): string => {
@@ -126,6 +126,7 @@ const newExampleOptions = (): Options => {
       captured: '.tmp/example/captured/',
       compared: '.tmp/example/compared/'
     },
+    report: htmlReport({ open: 'failed' }),
     scenarios: [
       scenario1(),
       scenario2(),

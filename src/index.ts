@@ -4,6 +4,7 @@ import { compare } from './compare';
 import { Options } from './data/options';
 import { Scenario } from './data/scenario';
 import { execute } from './execute';
+import { report as htmlReport } from './report/html';
 
 export {
   Options,
@@ -11,5 +12,6 @@ export {
   approve,
   capture,
   compare,
-  execute
+  execute,
+  htmlReport
 };

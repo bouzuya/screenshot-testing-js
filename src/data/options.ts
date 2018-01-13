@@ -1,3 +1,4 @@
+import { Report } from './report';
 import { Scenario } from './scenario';
 
 export interface Options {
@@ -6,5 +7,6 @@ export interface Options {
     captured: string;
     compared: string;
   };
+  report: Report;
   scenarios: Scenario[];
 }

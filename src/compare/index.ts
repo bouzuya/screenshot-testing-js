@@ -1,10 +1,9 @@
 import { CompareScenarioResult } from '../data/compare-scenario-result';
 import { Options } from '../data/options';
-import { report as htmlReport } from '../report/html';
 import { compareScenario } from './compare-scenario';
 
 const compare = (options: Options): Promise<void> => {
-  const { scenarios } = options;
+  const { report, scenarios } = options;
   return scenarios
     .reduce((promise, scenario) => {
       return promise
@@ -13,7 +12,7 @@ const compare = (options: Options): Promise<void> => {
             .then((result) => a.concat([result]));
         });
     }, Promise.resolve([] as CompareScenarioResult[]))
-    .then((results) => htmlReport({ open: 'always' })(options, results));
+    .then((results) => report(options, results));
 };
 
 export { compare };
