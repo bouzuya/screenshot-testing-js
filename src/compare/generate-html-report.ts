@@ -519,7 +519,7 @@ const js = (viewData: any): string => {
   return `window.ScreenshotTesting = ${JSON.stringify(viewData)};`;
 };
 
-const generateReport = (
+const generateHtmlReport = (
   {
     path: { approved, captured, compared }
   }: Options,
@@ -586,4 +586,4 @@ const generateReport = (
   ]).then(() => void open(reportHtmlPath));
 };
 
-export { generateReport };
+export { generateHtmlReport };
