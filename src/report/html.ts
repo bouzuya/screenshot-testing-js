@@ -3,6 +3,7 @@ import open = require('open');
 import { join as pathJoin, relative as pathRelative } from 'path';
 import { CompareScenarioResult } from '../data/compare-scenario-result';
 import { Options } from '../data/options';
+import { Report } from '../data/report';
 import { Scenario } from '../data/scenario';
 
 interface ViewData {
@@ -519,15 +520,15 @@ const js = (viewData: any): string => {
   return `window.ScreenshotTesting = ${JSON.stringify(viewData)};`;
 };
 
-const report = (reportOptions: { open: 'always' | 'failed' | 'never' }) => {
+const report = (
+  reportOptions: { open: 'always' | 'failed' | 'never' }
+): Report => {
   return (
     {
-      path: { approved, captured, compared }
+      path: { approved, captured, compared },
+      scenarios
     }: Options,
-    results: Array<{
-      result: CompareScenarioResult;
-      scenario: Scenario;
-    }>
+    results: CompareScenarioResult[]
   ): Promise<void> => {
     const passedFn = (x: {
       result: CompareScenarioResult;
@@ -536,9 +537,12 @@ const report = (reportOptions: { open: 'always' | 'failed' | 'never' }) => {
     const reportDirPath = pathJoin(compared, 'report');
     const reportHtmlPath = pathJoin(reportDirPath, 'report.html');
     const reportJsPath = pathJoin(reportDirPath, 'report.js');
+    const zipped = results.map((result, index) => {
+      return { result, scenario: scenarios[index] };
+    });
     const viewData: ViewData = {
       allCount: results.length,
-      details: results.map(({ result, scenario }) => {
+      details: zipped.map(({ result, scenario }) => {
         const approvedPath = pathRelative(
           reportDirPath,
           pathJoin(approved, scenario.name + '.png')
@@ -578,8 +582,8 @@ const report = (reportOptions: { open: 'always' | 'failed' | 'never' }) => {
           type: result.type
         };
       }),
-      failedCount: results.filter((i) => !passedFn(i)).length,
-      passedCount: results.filter((i) => passedFn(i)).length
+      failedCount: zipped.filter((i) => !passedFn(i)).length,
+      passedCount: zipped.filter((i) => passedFn(i)).length
     };
     return Promise.all([
       fs.outputFile(reportHtmlPath, html(pathRelative(reportDirPath, reportJsPath))),
