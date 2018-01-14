@@ -33,6 +33,16 @@ const options = {
 execute(command, options);
 ```
 
+## Badges
+
+[![npm version][npm-badge-url]][npm-url]
+[![Travis CI][travisci-badge-url]][travisci-url]
+
+[npm-badge-url]: https://img.shields.io/npm/v/@bouzuya/screenshot-testing.svg
+[npm-url]: https://www.npmjs.com/package/@bouzuya/screenshot-testing
+[travisci-badge-url]: https://img.shields.io/travis/bouzuya/screenshot-testing-js
+[travisci-url]: https://travis-ci.org/bouzuya/screenshot-testing-js
+
 ## License
 
 [MIT](LICENSE)
