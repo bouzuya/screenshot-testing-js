@@ -40,7 +40,7 @@ execute(command, options);
 
 [npm-badge-url]: https://img.shields.io/npm/v/@bouzuya/screenshot-testing.svg
 [npm-url]: https://www.npmjs.com/package/@bouzuya/screenshot-testing
-[travisci-badge-url]: https://img.shields.io/travis/bouzuya/screenshot-testing-js
+[travisci-badge-url]: https://img.shields.io/travis/bouzuya/screenshot-testing-js.svg
 [travisci-url]: https://travis-ci.org/bouzuya/screenshot-testing-js
 
 ## License
