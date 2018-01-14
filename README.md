@@ -11,7 +11,7 @@ npm install @bouzuya/screenshot-testing
 ## Usage
 
 ```js
-import { execute } from '@bouzuya/screenshot-testing';
+import { execute, htmlReport } from '@bouzuya/screenshot-testing';
 
 const command = process.argv[2]; // 'approve' or 'capture' or 'compare' or 'test'
 const options = {
@@ -20,6 +20,7 @@ const options = {
     captured: 'captured/',
     compared: 'compared/'
   },
+  report: htmlReport({ open: 'always' }),
   scenarios: [
     {
       action: async (page) => {
